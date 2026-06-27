@@ -12,7 +12,7 @@ def check_resale():
     r = requests.get(URL, timeout=10)
     soup = BeautifulSoup(r.text, "html.parser")
 
-    no_ticket = soup.find(string=lambda s: "現在販売中のチケット情報はありません" in s)
+    no_ticket = soup.find(string=lambda s: "現在販売中のチケット情報はあります" in s)
 
     if no_ticket:
         print("No resale tickets.")
