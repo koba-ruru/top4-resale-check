@@ -2,7 +2,7 @@ name: Check Pia Resale
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "* * * * *"
   workflow_dispatch:
 
 jobs:
