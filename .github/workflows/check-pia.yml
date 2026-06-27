@@ -1,0 +1,30 @@
+name: Check Pia Resale
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run checker
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TARGET_URL: "https://t.pia.jp/pia/event/event.do?eventCd=2604917"
+        run: |
+          python check.py
