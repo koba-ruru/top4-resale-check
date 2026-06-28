@@ -3,23 +3,38 @@ import requests
 from bs4 import BeautifulSoup
 
 WEBHOOK = os.environ["DISCORD_WEBHOOK"]
-URL = os.environ["TARGET_URL"]
+
+URLS = [
+    "https://t.pia.jp/pia/ticketInformation.do?eventCd=2604917&rlsCd=001",
+    "https://t.pia.jp/pia/ticketInformation.do?eventCd=2604917&rlsCd=002",
+]
+
+KEYWORD = "リセール情報"
 
 def notify_discord(message: str):
     requests.post(WEBHOOK, json={"content": message})
 
 def check_resale():
-    r = requests.get(URL, timeout=10)
-    soup = BeautifulSoup(r.text, "html.parser")
+    found = False
+    found_urls = []
 
-    no_ticket = soup.find(string=lambda s: "現在販売中のチケット情報はあります" in s)
+    for url in URLS:
+        r = requests.get(url, timeout=10)
+        soup = BeautifulSoup(r.text, "html.parser")
 
-    if no_ticket:
+        # ページ内にキーワードがあるかチェック
+        if soup.find(string=lambda s: KEYWORD in s):
+            found = True
+            found_urls.append(url)
+
+    if found:
+        msg = "🎫 リセールチケットが見つかったよ！\n"
+        for u in found_urls:
+            msg += f"- {u}\n"
+        notify_discord(msg)
+        print("Resale ticket found!")
+    else:
         print("No resale tickets.")
-        return
-
-    notify_discord(f"🎫 リセール在庫が出たよ！\n{URL}")
-    print("Resale ticket found!")
 
 if __name__ == "__main__":
     check_resale()
